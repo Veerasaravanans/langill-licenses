@@ -26,7 +26,7 @@
     "LGL-F2UG-BZHM-QR45": {
       "created_at": "2026-06-21T08:38:09.230Z",
       "user_label": "unlabeled",
-      "status": "active",
+      "status": "revoked",
       "bound_device": null,
       "install_count": 0,
       "version_installed": null
