@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Langill Admin Dashboard</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  header h1 {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  header h1 span { color: var(--accent); }
+
+  .header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .stats-bar {
+    display: flex;
+    gap: 24px;
+    padding: 16px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stat-value {
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  main { padding: 24px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  thead th {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  tbody tr:hover { background: rgba(88, 166, 255, 0.04); }
+
+  .key-cell {
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .badge-active { background: rgba(63, 185, 80, 0.15); color: var(--green); }
+  .badge-revoked { background: rgba(248, 81, 73, 0.15); color: var(--red); }
+  .badge-expired { background: rgba(210, 153, 34, 0.15); color: var(--yellow); }
+  .badge-unbound { background: rgba(139, 148, 158, 0.15); color: var(--text-muted); }
+
+  button {
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  .btn-primary:hover { background: #4c9aed; }
+
+  .btn-danger {
+    background: transparent;
+    color: var(--red);
+    border-color: var(--red);
+  }
+
+  .btn-danger:hover { background: rgba(248, 81, 73, 0.1); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+  }
+
+  .btn-ghost:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+
+  .btn-sm { padding: 3px 10px; font-size: 12px; }
+
+  /* Auth screen */
+  #auth-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    gap: 16px;
+  }
+
+  #auth-screen h2 { font-size: 24px; }
+  #auth-screen p { color: var(--text-muted); max-width: 400px; text-align: center; }
+
+  input[type="password"], input[type="text"] {
+    font-family: var(--mono);
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    width: 100%;
+    max-width: 400px;
+  }
+
+  input:focus { outline: none; border-color: var(--accent); }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    min-width: 420px;
+    max-width: 520px;
+  }
+
+  .modal h3 { margin-bottom: 16px; }
+
+  .modal-field {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-field:last-child { border-bottom: none; }
+
+  .modal-label { color: var(--text-muted); font-size: 13px; }
+  .modal-value { font-family: var(--mono); font-size: 13px; }
+
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+
+  .action-btns { display: flex; gap: 6px; }
+
+  #error-bar {
+    background: rgba(248, 81, 73, 0.1);
+    color: var(--red);
+    padding: 10px 24px;
+    font-size: 13px;
+    display: none;
+    border-bottom: 1px solid rgba(248, 81, 73, 0.3);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--text-muted);
+  }
+
+  .generate-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .generate-form input {
+    max-width: 200px;
+  }
+</style>
+</head>
+<body>
+
+<div id="auth-screen">
+  <h2>Langill <span style="color: var(--accent)">Admin</span></h2>
+  <p>Enter your GitHub Personal Access Token to manage license keys. Token is stored in session only.</p>
+  <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxxx">
+  <button class="btn-primary" onclick="authenticate()">Connect</button>
+</div>
+
+<div id="dashboard" style="display:none">
+  <header>
+    <h1>Langill <span>Admin</span></h1>
+    <div class="header-actions">
+      <div class="generate-form">
+        <input type="text" id="new-key-label" placeholder="Label (e.g. john-doe)">
+        <button class="btn-primary" onclick="generateKey()">Generate Key</button>
+      </div>
+      <button class="btn-ghost" onclick="loadData()">Refresh</button>
+      <button class="btn-ghost btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <div id="error-bar"></div>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <span class="stat-value" id="stat-total">—</span>
+      <span class="stat-label">Total Keys</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value" style="color:var(--green)" id="stat-active">—</span>
+      <span class="stat-label">Active</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value" style="color:var(--red)" id="stat-revoked">—</span>
+      <span class="stat-label">Revoked</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value" style="color:var(--accent)" id="stat-bound">—</span>
+      <span class="stat-label">Bound Devices</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value" id="stat-version">—</span>
+      <span class="stat-label">Latest Version</span>
+    </div>
+  </div>
+
+  <main>
+    <table>
+      <thead>
+        <tr>
+          <th>License Key</th>
+          <th>Label</th>
+          <th>Status</th>
+          <th>Device</th>
+          <th>Last Seen</th>
+          <th>Version</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="keys-table"></tbody>
+    </table>
+    <div id="empty-state" class="empty-state" style="display:none">
+      No license keys yet. Click <strong>Generate Key</strong> to create one.
+    </div>
+  </main>
+</div>
+
+<div id="modal-container"></div>
+
+<script>
+const LICENSES_REPO = "Veerasaravanans/langill-licenses";
+const LICENSES_FILE = "licenses.json";
+const VERSIONS_FILE = "versions.json";
+
+let TOKEN = "";
+let licensesData = null;
+let licensesSha = "";
+let versionsData = null;
+
+function authenticate() {
+  TOKEN = document.getElementById("token-input").value.trim();
+  if (!TOKEN) return;
+  sessionStorage.setItem("langill_token", TOKEN);
+  document.getElementById("auth-screen").style.display = "none";
+  document.getElementById("dashboard").style.display = "block";
+  loadData();
+}
+
+function logout() {
+  TOKEN = "";
+  sessionStorage.removeItem("langill_token");
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("auth-screen").style.display = "flex";
+  document.getElementById("token-input").value = "";
+}
+
+async function api(url, options = {}) {
+  const resp = await fetch(url, {
+    ...options,
+    headers: {
+      "Authorization": `Bearer ${TOKEN}`,
+      "Accept": options.rawJson ? "application/vnd.github.raw+json" : "application/vnd.github+json",
+      "User-Agent": "langill-admin-dashboard",
+      ...(options.headers || {}),
+    },
+  });
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(`GitHub API ${resp.status}: ${text}`);
+  }
+  return resp.json();
+}
+
+async function loadData() {
+  hideError();
+  try {
+    const [licMeta, versions] = await Promise.all([
+      api(`https://api.github.com/repos/${LICENSES_REPO}/contents/${LICENSES_FILE}`),
+      api(`https://api.github.com/repos/${LICENSES_REPO}/contents/${VERSIONS_FILE}`, { rawJson: true }),
+    ]);
+
+    licensesSha = licMeta.sha;
+    licensesData = JSON.parse(atob(licMeta.content));
+    versionsData = versions;
+
+    renderStats();
+    renderTable();
+  } catch (e) {
+    showError(e.message);
+  }
+}
+
+function renderStats() {
+  const keys = Object.entries(licensesData.keys || {});
+  const active = keys.filter(([, v]) => v.status === "active").length;
+  const revoked = keys.filter(([, v]) => v.status === "revoked").length;
+  const bound = keys.filter(([, v]) => v.bound_device && v.bound_device.machine_id).length;
+
+  document.getElementById("stat-total").textContent = keys.length;
+  document.getElementById("stat-active").textContent = active;
+  document.getElementById("stat-revoked").textContent = revoked;
+  document.getElementById("stat-bound").textContent = bound;
+  document.getElementById("stat-version").textContent = versionsData?.latest || "—";
+}
+
+function esc(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function renderTable() {
+  const tbody = document.getElementById("keys-table");
+  const entries = Object.entries(licensesData.keys || {});
+
+  if (entries.length === 0) {
+    tbody.innerHTML = "";
+    document.getElementById("empty-state").style.display = "block";
+    return;
+  }
+
+  document.getElementById("empty-state").style.display = "none";
+
+  entries.sort((a, b) => (b[1].created_at || "").localeCompare(a[1].created_at || ""));
+
+  tbody.innerHTML = entries.map(([key, data]) => {
+    const status = data.status || "unknown";
+    const badgeClass = status === "active" ? "badge-active" : status === "revoked" ? "badge-revoked" : "badge-expired";
+    const device = data.bound_device;
+    const deviceText = device && device.machine_id
+      ? esc(device.hostname || "unknown")
+      : '<span class="badge badge-unbound">Unbound</span>';
+    const lastSeen = device && device.last_seen ? timeAgo(device.last_seen) : "—";
+    const version = esc(data.version_installed || "—");
+
+    return `<tr>
+      <td class="key-cell">${esc(key)}</td>
+      <td>${esc(data.user_label || "—")}</td>
+      <td><span class="badge ${badgeClass}">${esc(status)}</span></td>
+      <td>${deviceText}</td>
+      <td>${lastSeen}</td>
+      <td>${version}</td>
+      <td class="action-btns">
+        ${device && device.machine_id ? `<button class="btn-ghost btn-sm" onclick="showDevice(${JSON.stringify(key)})">Details</button>` : ""}
+        ${status === "active" ? `<button class="btn-danger btn-sm" onclick="revokeKey(${JSON.stringify(key)})">Revoke</button>` : ""}
+        ${device && device.machine_id ? `<button class="btn-ghost btn-sm" onclick="unbindKey(${JSON.stringify(key)})">Unbind</button>` : ""}
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+function showDevice(key) {
+  const data = licensesData.keys[key];
+  if (!data || !data.bound_device) return;
+  const d = data.bound_device;
+
+  document.getElementById("modal-container").innerHTML = `
+    <div class="modal-overlay" onclick="closeModal(event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <h3>Device Details — ${esc(key)}</h3>
+        <div class="modal-field"><span class="modal-label">Machine ID</span><span class="modal-value">${esc(d.machine_id || "—")}</span></div>
+        <div class="modal-field"><span class="modal-label">Hostname</span><span class="modal-value">${esc(d.hostname || "—")}</span></div>
+        <div class="modal-field"><span class="modal-label">OS</span><span class="modal-value">${esc(d.os || "—")}</span></div>
+        <div class="modal-field"><span class="modal-label">IP</span><span class="modal-value">${esc(d.ip || "—")}</span></div>
+        <div class="modal-field"><span class="modal-label">First Seen</span><span class="modal-value">${esc(d.first_seen || "—")}</span></div>
+        <div class="modal-field"><span class="modal-label">Last Seen</span><span class="modal-value">${esc(d.last_seen || "—")}</span></div>
+        <div class="modal-field"><span class="modal-label">Version</span><span class="modal-value">${esc(data.version_installed || "—")}</span></div>
+        <div class="modal-actions"><button class="btn-ghost" onclick="closeModal()">Close</button></div>
+      </div>
+    </div>`;
+}
+
+function closeModal(event) {
+  if (!event || event.target.classList.contains("modal-overlay")) {
+    document.getElementById("modal-container").innerHTML = "";
+  }
+}
+
+async function generateKey() {
+  const label = document.getElementById("new-key-label").value.trim() || "unlabeled";
+  const seg = () => {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const arr = new Uint8Array(4);
+    crypto.getRandomValues(arr);
+    let s = "";
+    for (let i = 0; i < 4; i++) s += chars[arr[i] % chars.length];
+    return s;
+  };
+  const key = `LGL-${seg()}-${seg()}-${seg()}`;
+  const now = new Date().toISOString();
+
+  licensesData.keys[key] = {
+    created_at: now,
+    user_label: label,
+    status: "active",
+    bound_device: null,
+    install_count: 0,
+    version_installed: null,
+  };
+
+  try {
+    await saveLicenses(`Add key for ${label}`);
+    document.getElementById("new-key-label").value = "";
+    renderStats();
+    renderTable();
+    showCopyModal(key, label);
+  } catch (e) {
+    showError("Failed to generate key: " + e.message);
+  }
+}
+
+function showCopyModal(key, label) {
+  document.getElementById("modal-container").innerHTML = `
+    <div class="modal-overlay" onclick="closeModal(event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <h3>Key Generated</h3>
+        <p style="color:var(--text-muted); margin-bottom: 12px">Share this key with <strong>${esc(label)}</strong>. It can only be shown once.</p>
+        <div style="background:var(--bg); padding: 12px; border-radius: 6px; font-family: var(--mono); font-size: 16px; text-align: center; letter-spacing: 1px; user-select: all;">${esc(key)}</div>
+        <div class="modal-actions">
+          <button class="btn-ghost" onclick="navigator.clipboard.writeText(${JSON.stringify(key)}); this.textContent='Copied!'">Copy</button>
+          <button class="btn-primary" onclick="closeModal()">Done</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function revokeKey(key) {
+  if (!confirm(`Revoke key ${key}? The user will lose access on next startup.`)) return;
+  licensesData.keys[key].status = "revoked";
+  try {
+    await saveLicenses(`Revoke key ${key}`);
+    renderStats();
+    renderTable();
+  } catch (e) {
+    showError("Failed to revoke: " + e.message);
+  }
+}
+
+async function unbindKey(key) {
+  if (!confirm(`Unbind device from ${key}? The key can then be used on a new device.`)) return;
+  licensesData.keys[key].bound_device = null;
+  licensesData.keys[key].install_count = 0;
+  try {
+    await saveLicenses(`Unbind device from ${key}`);
+    renderStats();
+    renderTable();
+  } catch (e) {
+    showError("Failed to unbind: " + e.message);
+  }
+}
+
+async function saveLicenses(message) {
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(licensesData, null, 2))));
+  const resp = await fetch(`https://api.github.com/repos/${LICENSES_REPO}/contents/${LICENSES_FILE}`, {
+    method: "PUT",
+    headers: {
+      "Authorization": `Bearer ${TOKEN}`,
+      "Accept": "application/vnd.github+json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ message, content, sha: licensesSha }),
+  });
+  if (!resp.ok) throw new Error(await resp.text());
+  const result = await resp.json();
+  licensesSha = result.content.sha;
+}
+
+function timeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 30) return `${days}d ago`;
+  return new Date(iso).toLocaleDateString();
+}
+
+function showError(msg) {
+  const bar = document.getElementById("error-bar");
+  bar.textContent = msg;
+  bar.style.display = "block";
+}
+
+function hideError() {
+  document.getElementById("error-bar").style.display = "none";
+}
+
+// Restore session
+(function init() {
+  const saved = sessionStorage.getItem("langill_token");
+  if (saved) {
+    TOKEN = saved;
+    document.getElementById("auth-screen").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+    loadData();
+  }
+})();
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeModal();
+  if (e.key === "Enter" && document.getElementById("auth-screen").style.display !== "none") {
+    authenticate();
+  }
+});
+</script>
+</body>
+</html>
