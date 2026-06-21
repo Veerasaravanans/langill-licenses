@@ -30,6 +30,14 @@
       "bound_device": null,
       "install_count": 0,
       "version_installed": null
+    },
+    "LGL-HM8H-ZMU8-3KF7": {
+      "created_at": "2026-06-21T09:28:46Z",
+      "user_label": "sample-user",
+      "status": "active",
+      "bound_device": {},
+      "install_count": 0,
+      "version_installed": ""
     }
   },
   "settings": {
