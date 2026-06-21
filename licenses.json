@@ -1,5 +1,14 @@
 {
-  "keys": {},
+  "keys": {
+    "LGL-XUTK-7MEK-BSE4": {
+      "created_at": "2026-06-21T08:14:09Z",
+      "user_label": "test-device",
+      "status": "active",
+      "bound_device": {},
+      "install_count": 0,
+      "version_installed": ""
+    }
+  },
   "settings": {
     "max_installs_per_key": 1,
     "key_prefix": "LGL"
