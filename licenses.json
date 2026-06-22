@@ -43,8 +43,15 @@
       "created_at": "2026-06-22T06:11:38.005Z",
       "user_label": "Chiranjeevi",
       "status": "active",
-      "bound_device": null,
-      "install_count": 0,
+      "bound_device": {
+        "machine_id": "c4c48ce5490e60c3262b5f41a92244a8",
+        "hostname": "inl00876.ebgroup.elektrobit.com",
+        "os": "Linux 5.15.0-139-generic",
+        "ip": "10.64.54.254",
+        "first_seen": "2026-06-22T07:04:23Z",
+        "last_seen": "2026-06-22T07:04:23Z"
+      },
+      "install_count": 1,
       "version_installed": null
     },
     "LGL-DG7S-597G-BCQ8": {
