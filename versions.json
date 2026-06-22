@@ -1,8 +1,19 @@
 {
-  "latest": "0.1.1",
+  "latest": "0.1.2",
   "minimum_supported": "0.1.0",
-  "release_notes": "Persona system + gh PATH fix for compiled binary",
+  "release_notes": "Fix boot resume after BIOS setup + correct Alt+M keybinding display",
   "releases": {
+    "0.1.2": {
+      "date": "2026-06-22",
+      "notes": "Fix boot sequence not completing after setup, correct Ctrl+M -> Alt+M display",
+      "assets": {
+        "linux-x64": "langill-linux-x64",
+        "linux-arm64": "langill-linux-arm64",
+        "macos-x64": "langill-macos-x64",
+        "macos-arm64": "langill-macos-arm64",
+        "windows-x64": "langill-windows-x64.exe"
+      }
+    },
     "0.1.1": {
       "date": "2026-06-22",
       "notes": "Add Langill persona identity, fix gh binary PATH resolution in compiled builds",
