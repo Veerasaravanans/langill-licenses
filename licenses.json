@@ -58,7 +58,7 @@
     "LGL-KTPK-2C7Q-JL8F": {
       "created_at": "2026-07-01T10:04:24.456Z",
       "user_label": "rishi",
-      "status": "active",
+      "status": "revoked",
       "bound_device": null,
       "install_count": 0,
       "version_installed": null
